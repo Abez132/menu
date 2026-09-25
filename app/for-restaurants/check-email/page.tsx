@@ -1,0 +1,7 @@
+import Link from "next/link";
+
+export default function CheckOwnerEmailPage() {
+  return (
+    <main className="detail-page"><header className="site-header detail-header"><div className="header-inner"><Link className="brand" href="/"><span className="brand-mark" aria-hidden="true"><span /></span><span>yene<span className="brand-menu">menu</span></span></Link><Link className="header-cta" href="/">Home <span>↗</span></Link></div></header><section className="owner-message-page"><span className="owner-message-icon">✉</span><p className="eyebrow">One quick check</p><h1>Check your<br /><em>inbox.</em></h1><p>We sent a verification link to your email. Confirm your address and we’ll send your restaurant listing to the administrator for review.</p><div className="owner-signup-note"><span>✳</span><p><strong>What happens next?</strong><br />After you confirm, your listing stays private until an administrator approves it. You can then sign in to manage your restaurant.</p></div><Link className="owner-page-link" href="/for-restaurants/sign-in">Already verified? Sign in →</Link></section><footer className="site-footer detail-footer"><div className="footer-top"><Link className="brand" href="/"><span className="brand-mark" aria-hidden="true"><span /></span><span>yene<span className="brand-menu">menu</span></span></Link><p>A little closer to your next<br />favourite meal.</p><Link href="/">Back to home ↑</Link></div><div className="footer-bottom"><span>© 2026 Yene Menu · Addis Ababa</span><span>Menu details provided by restaurants.</span></div></footer></main>
+  );
+}

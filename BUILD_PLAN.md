@@ -10,11 +10,13 @@
 
 Current files include the public home page, restaurant detail pages, a restaurant-owner information placeholder, and six sample restaurants with ETB menu prices. The package manifest is ready, but the package registry returned an access-denied error during dependency installation, so the app has not yet been launched locally.
 
-## Part 2 — Restaurant onboarding (next)
+## Part 2 — Restaurant onboarding (implementation drafted; Supabase connection pending)
 
 - Add restaurant registration and owner sign-in with email verification.
 - Collect restaurant details and send new listings to the administrator review queue.
 - Keep owner account details private.
+
+The sign-up, sign-in, confirmation callback, and owner listing status pages are implemented. The SQL migration enforces email verification and administrator-only publication. To activate the flow, install the Supabase packages, configure `.env.local`, and apply the migration using the setup notes in `README.md`.
 
 ## Part 3 — Owner menu management
 
