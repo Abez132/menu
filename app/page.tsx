@@ -54,8 +54,10 @@ export default async function HomePage() {
     }
   } catch { /* Sample discovery remains available until the database is configured. */ }
 
-  const isPreview = liveListings.length === 0;
-  const listings = isPreview ? previewRestaurants.map((restaurant) => ({
+  // Vercel preview builds use NODE_ENV=production too, so keep previews distinct from the live domain.
+  const mayShowSamples = process.env.NODE_ENV !== "production" || process.env.VERCEL_ENV === "preview";
+  const isPreview = liveListings.length === 0 && mayShowSamples;
+  const listings = liveListings.length > 0 ? liveListings : isPreview ? previewRestaurants.map((restaurant) => ({
     slug: restaurant.slug,
     name: restaurant.name,
     category: restaurant.category,
@@ -66,7 +68,7 @@ export default async function HomePage() {
     priceLevel: restaurant.priceLevel,
     menuCount: restaurant.menu.reduce((count, section) => count + section.items.length, 0),
     updated: restaurant.updated,
-  })) : liveListings;
+  })) : [];
 
   return <HomeView restaurants={listings} isPreview={isPreview} />;
 }

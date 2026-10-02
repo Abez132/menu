@@ -8,7 +8,7 @@
 - Add restaurant detail pages with sample menus, ETB prices, and menu confirmation dates.
 - Use clearly identified preview data until real restaurants are onboarded.
 
-Current files include the public home page, restaurant detail pages, restaurant-owner information, and six sample restaurants with ETB menu prices. The home page now displays approved restaurants with confirmed menus when connected to Supabase, and uses clearly labelled samples until real menus are available.
+Current files include the public home page, restaurant detail pages, restaurant-owner information, and six sample restaurants with ETB menu prices. The home page displays approved restaurants with confirmed menus when connected to Supabase, uses clearly labelled samples outside production, and avoids presenting sample restaurants as real production listings.
 
 ## Part 2 — Restaurant onboarding (implementation drafted; Supabase connection pending)
 
@@ -35,11 +35,13 @@ The owner dashboard now links approved restaurants to a menu studio with editabl
 
 The `/admin` area is restricted with the database-backed administrator role. It includes listing queues for pending, approved, declined, and hidden restaurants; approval, decline, hide, and restore actions; detail corrections; and a private menu report queue with resolution notes. Administrators can inspect the reported menu version and its uploaded files, and hide or restore an individual menu without suspending the restaurant. Visitors can report an issue on a live restaurant menu. Only administrators can read reports and reporter contact details.
 
-## Part 5 — Launch preparation
+## Part 5 — Launch preparation (deployment handoff prepared; account setup remains)
 
 - Connect Supabase for data, authentication, and file storage.
 - Configure production settings and deployment.
 - Onboard initial Addis Ababa restaurants and review the complete experience.
+
+The production homepage no longer presents sample restaurants as real listings: samples are limited to non-production builds, and production has an empty state until a real confirmed menu is published. `LAUNCH_CHECKLIST.md` covers production Supabase migrations and Auth/SMTP settings, Vercel configuration, admin promotion, hands-on release checks, and the first restaurant onboarding. Deployment, credentials, domain/DNS, email delivery, and onboarding require the project owner's service accounts and operational decisions; they have not been changed from this workspace.
 
 ## Decisions already recorded
 
