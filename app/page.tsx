@@ -4,6 +4,7 @@ import type { MenuContent } from "@/lib/menu-types";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function HomePage() {
+  let viewerName: string | null = null;
   let liveListings: {
     slug: string;
     name: string;
@@ -19,6 +20,13 @@ export default async function HomePage() {
 
   try {
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const fullName = user.user_metadata?.full_name;
+      viewerName = typeof fullName === "string" && fullName.trim()
+        ? fullName.trim().split(/\s+/)[0]
+        : user.email?.split("@")[0] ?? "there";
+    }
     const { data: approved } = await supabase.from("restaurants")
       .select("id, slug, name, category, neighborhood")
       .eq("status", "approved")
@@ -66,9 +74,9 @@ export default async function HomePage() {
     imageAlt: restaurant.imageAlt,
     rating: restaurant.rating,
     priceLevel: restaurant.priceLevel,
-    menuCount: restaurant.menu.reduce((count, section) => count + section.items.length, 0),
+    menuCount: restaurant.menu.length,
     updated: restaurant.updated,
   })) : [];
 
-  return <HomeView restaurants={listings} isPreview={isPreview} />;
+  return <HomeView restaurants={listings} isPreview={isPreview} viewerName={viewerName} />;
 }

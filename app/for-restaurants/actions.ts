@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export type OwnerAuthState = { error?: string };
+export type OwnerAuthState = { error?: string; success?: string };
 const categories = new Set(["Ethiopian", "Café & brunch", "Grill", "Italian", "Healthy", "Other"]);
 const neighborhoods = new Set(["Bole", "Kazanchis", "Piazza", "Sarbet", "Old Airport", "Mexico", "Kirkos", "Other"]);
 
@@ -91,4 +91,29 @@ export async function signInOwner(_state: OwnerAuthState, formData: FormData): P
   }
 
   redirect("/owner-dashboard");
+}
+
+export async function resendOwnerConfirmation(_state: OwnerAuthState, formData: FormData): Promise<OwnerAuthState> {
+  const email = value(formData, "email").toLowerCase();
+  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: "Enter the email address you used to create your owner account." };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) return { error: "Email confirmation isn’t configured yet. Please contact the Yene Menu team." };
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${siteUrl.replace(/\/$/, "")}/auth/confirm` },
+    });
+    if (error) {
+      return { error: "We couldn’t request a new email right now. If you requested one recently, wait a minute and try again." };
+    }
+    return { success: "If an unconfirmed account exists for this email, a fresh confirmation message has been requested. Check your inbox and spam folder." };
+  } catch {
+    return { error: "We couldn’t request a new email right now. Please try again later." };
+  }
 }

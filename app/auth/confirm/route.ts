@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       throw new Error("Restaurant details were not found for this account.");
     }
 
-    const { data: existing } = await supabase.from("restaurants").select("id").eq("owner_id", user.id).maybeSingle();
+    const { data: existing } = await supabase.from("restaurants").select("id").eq("owner_id", user.id).limit(1).maybeSingle();
     if (!existing) {
       const { error: insertError } = await supabase.from("restaurants").insert({
         owner_id: user.id,

@@ -5,11 +5,14 @@ import { createMenuDraft } from "./actions";
 import { MenuEditor } from "./editor";
 import type { MenuAsset, MenuContent } from "@/lib/menu-types";
 
-export default async function OwnerMenuPage() {
+export default async function OwnerMenuPage({ searchParams }: { searchParams: Promise<{ restaurantId?: string }> }) {
+  const query = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/for-restaurants/sign-in");
-  const { data: restaurant } = await supabase.from("restaurants").select("id, name, slug, neighborhood, status").eq("owner_id", user.id).maybeSingle();
+  const restaurantId = query.restaurantId ?? "";
+  if (!/^[0-9a-f-]{36}$/i.test(restaurantId)) redirect("/owner-dashboard");
+  const { data: restaurant } = await supabase.from("restaurants").select("id, name, slug, neighborhood, status").eq("owner_id", user.id).eq("id", restaurantId).maybeSingle();
   if (!restaurant) redirect("/owner-dashboard");
 
   const { data: draft } = restaurant.status === "approved"
@@ -36,7 +39,7 @@ export default async function OwnerMenuPage() {
       <h1>{restaurant.name}<br /><em>menu.</em></h1>
       {restaurant.status !== "approved" ? <div className="owner-dashboard-card"><span>◷</span><div><strong>Your listing is awaiting review.</strong><p>You can start adding a menu once the Yene Menu team approves your restaurant listing.</p></div></div> : <>
         {published?.status === "hidden" ? <div className="admin-notice error">Your last confirmed menu is temporarily hidden while the Yene Menu team reviews a report. You can prepare an updated draft below.</div> : <div className="owner-menu-status"><span className="check-dot">✓</span>{published?.confirmed_at ? `Current public menu confirmed ${new Date(published.confirmed_at).toLocaleDateString("en-ET", { timeZone: "Africa/Addis_Ababa", day: "numeric", month: "long", year: "numeric" })}` : "No public menu yet. Your first confirmed menu will appear on your listing."}</div>}
-        {draft ? <MenuEditor restaurantId={restaurant.id} versionId={draft.id} initialContent={(draft.content as MenuContent | null) ?? { sections: [] }} initialAssets={assets} updatedAt={draft.updated_at} /> : <form action={createMenuDraft} className="owner-menu-start"><span className="owner-message-icon">✳</span><h2>Make your menu yours.</h2><p>Add dishes and prices, upload a menu photo or PDF, or use both. You can review the whole menu before you confirm it for customers.</p><button className="owner-submit" type="submit">{published ? "Start a new menu version" : "Create your first menu"}<span>→</span></button></form>}
+        {draft ? <MenuEditor restaurantId={restaurant.id} versionId={draft.id} initialContent={(draft.content as MenuContent | null) ?? { sections: [] }} initialAssets={assets} updatedAt={draft.updated_at} /> : <form action={createMenuDraft} className="owner-menu-start"><input type="hidden" name="restaurantId" value={restaurant.id} /><span className="owner-message-icon">✳</span><h2>Make your menu yours.</h2><p>Add dishes and prices, upload a menu photo or PDF, or use both. You can review the whole menu before you confirm it for customers.</p><button className="owner-submit" type="submit">{published ? "Start a new menu version" : "Create your first menu"}<span>→</span></button></form>}
       </>}
     </section>
     <footer className="site-footer detail-footer"><div className="footer-bottom"><span>© 2026 Yene Menu · Addis Ababa</span><span>Your draft stays private until you confirm it.</span></div></footer>

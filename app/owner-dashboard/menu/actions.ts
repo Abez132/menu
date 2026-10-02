@@ -11,16 +11,18 @@ const acceptedTypes = new Set(["application/pdf", "image/jpeg", "image/png", "im
 
 export type MenuActionState = { error?: string; success?: string };
 
-export async function createMenuDraft() {
+export async function createMenuDraft(formData: FormData) {
+  const restaurantId = String(formData.get("restaurantId") ?? "");
+  if (!/^[0-9a-f-]{36}$/i.test(restaurantId)) redirect("/owner-dashboard");
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/for-restaurants/sign-in");
 
-  const { data: restaurant } = await supabase.from("restaurants").select("id, status").eq("owner_id", user.id).maybeSingle();
+  const { data: restaurant } = await supabase.from("restaurants").select("id, status").eq("id", restaurantId).eq("owner_id", user.id).maybeSingle();
   if (!restaurant || restaurant.status !== "approved") redirect("/owner-dashboard");
 
   const { data: existing } = await supabase.from("menu_versions").select("id").eq("restaurant_id", restaurant.id).eq("status", "draft").maybeSingle();
-  if (existing) redirect("/owner-dashboard/menu");
+  if (existing) redirect(`/owner-dashboard/menu?restaurantId=${restaurant.id}`);
 
   const { data: published } = await supabase.from("menu_versions").select("id, content").eq("restaurant_id", restaurant.id).in("status", ["published", "hidden"]).maybeSingle();
   const { data: draft, error } = await supabase.from("menu_versions").insert({
@@ -36,7 +38,7 @@ export async function createMenuDraft() {
       await supabase.from("menu_assets").insert(oldAssets.map((asset) => ({ ...asset, version_id: draft.id })));
     }
   }
-  redirect("/owner-dashboard/menu");
+  redirect(`/owner-dashboard/menu?restaurantId=${restaurant.id}`);
 }
 
 function parseContent(value: FormDataEntryValue | null): MenuContent | null {

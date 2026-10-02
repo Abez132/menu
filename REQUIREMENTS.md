@@ -12,6 +12,7 @@ A mobile-friendly website for finding restaurants in Addis Ababa, Ethiopia, and 
 
 - **Visitor:** Browses restaurants and menus without creating an account.
 - **Restaurant owner/manager:** Submits a restaurant, uploads or enters its menu, and confirms menu content before it is published.
+- A verified restaurant owner can manage multiple restaurant listings from the same account.
 - **Administrator:** Reviews new restaurant listings, manages published listings, and handles reports or unsuitable content.
 
 ## 3. V1 goals

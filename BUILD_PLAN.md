@@ -16,7 +16,7 @@ Current files include the public home page, restaurant detail pages, restaurant-
 - Collect restaurant details and send new listings to the administrator review queue.
 - Keep owner account details private.
 
-The sign-up, sign-in, confirmation callback, and owner listing status pages are implemented. The SQL migration enforces email verification and administrator-only publication. To activate the flow, configure `.env.local` and apply the migration using the setup notes in `README.md`.
+The sign-up, sign-in, confirmation callback, and owner listing status pages are implemented. Verified owners can now submit multiple restaurant listings from one account; each listing is reviewed separately. The SQL migration enforces email verification and administrator-only publication. To activate the flow, configure `.env.local` and apply the migration using the setup notes in `README.md`.
 
 ## Part 3 — Owner menu management (implemented; apply the new migration)
 

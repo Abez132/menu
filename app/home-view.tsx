@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { categories } from "@/lib/restaurants";
+import { signOutOwner } from "@/app/owner-dashboard/actions";
 
 type ListingCard = {
   slug: string;
@@ -44,7 +45,7 @@ function RestaurantCard({ restaurant, index }: { restaurant: ListingCard; index:
   );
 }
 
-export default function Home({ restaurants, isPreview }: { restaurants: ListingCard[]; isPreview: boolean }) {
+export default function Home({ restaurants, isPreview, viewerName }: { restaurants: ListingCard[]; isPreview: boolean; viewerName: string | null }) {
   const [activeCategory, setActiveCategory] = useState("All menus");
   const [query, setQuery] = useState("");
   const filteredRestaurants = useMemo(() => restaurants.filter((restaurant) => {
@@ -60,7 +61,16 @@ export default function Home({ restaurants, isPreview }: { restaurants: ListingC
         <div className="header-inner">
           <Brand />
           <nav className="main-nav" aria-label="Main navigation"><a href="#restaurants">Explore menus</a><a href="#how-it-works">How it works</a></nav>
-          <a className="header-cta" href="#restaurants">Find a table <span>↗</span></a>
+          <div className="home-account-actions">
+            {viewerName ? <>
+              <span className="home-signed-in">Hi, {viewerName}</span>
+              <Link className="header-cta" href="/owner-dashboard">Dashboard <span>↗</span></Link>
+              <form action={signOutOwner}><button className="home-signout" type="submit">Sign out</button></form>
+            </> : <>
+              <Link className="home-auth-link" href="/for-restaurants/sign-in">Sign in</Link>
+              <Link className="header-cta" href="/for-restaurants">Restaurant sign up <span>↗</span></Link>
+            </>}
+          </div>
         </div>
       </header>
 
@@ -99,7 +109,7 @@ export default function Home({ restaurants, isPreview }: { restaurants: ListingC
         </div>
       </section>
 
-      <section className="owner-banner"><div className="owner-copy"><span className="owner-kicker">FOR THE PEOPLE BEHIND THE PLATES</span><h2>Your food deserves<br />to be <em>found.</em></h2><p>We're making it easier for people in Addis to discover what's on your menu.</p></div><div className="owner-action"><span className="owner-ornament">✳</span><Link href="/for-restaurants">I'm a restaurant owner <span>↗</span></Link><small>Add your restaurant to Yene Menu.</small></div></section>
+      <section className="owner-banner"><div className="owner-copy"><span className="owner-kicker">FOR THE PEOPLE BEHIND THE PLATES</span><h2>Your food deserves<br />to be <em>found.</em></h2><p>We're making it easier for people in Addis to discover what's on your menu.</p></div><div className="owner-action"><span className="owner-ornament">✳</span><Link href="/for-restaurants">I'm a restaurant owner <span>↗</span></Link><small>New here? <Link href="/for-restaurants">Create an account</Link> · <Link href="/for-restaurants/sign-in">Sign in</Link></small></div></section>
 
       <footer className="site-footer"><div className="footer-top"><Brand /><p>A little closer to your next<br />favourite meal.</p><a href="#restaurants">Back to the top ↑</a></div><div className="footer-bottom"><span>© 2026 Yene Menu · Addis Ababa</span><span>Made with care, and a little appetite <b>✳</b></span><span>Menu details provided by restaurants.</span></div></footer>
     </main>
