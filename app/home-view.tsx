@@ -15,6 +15,7 @@ type ListingCard = {
   rating: string | null;
   priceLevel: string | null;
   menuCount: number;
+  menuPublished: boolean;
   updated: string;
 };
 
@@ -38,8 +39,8 @@ function RestaurantCard({ restaurant, index }: { restaurant: ListingCard; index:
       </div>
       <div className="card-content">
         <div className="card-title-row"><h3>{restaurant.name}</h3>{restaurant.rating && <span className="rating"><span>★</span> {restaurant.rating}</span>}</div>
-        <p className="card-meta">{restaurant.area}<span>·</span>{restaurant.priceLevel ?? "ETB"}<span>·</span>{restaurant.menuCount ? `${restaurant.menuCount} dishes` : "Photo / PDF menu"}</p>
-        <div className="card-bottom"><span className="checked"><span className="check-dot">✓</span> Menu checked {restaurant.updated}</span><span className="card-arrow">↗</span></div>
+        <p className="card-meta">{restaurant.area}<span>·</span>{restaurant.priceLevel ?? "ETB"}<span>·</span>{restaurant.menuPublished ? restaurant.menuCount ? `${restaurant.menuCount} dishes` : "Photo / PDF menu" : "Menu coming soon"}</p>
+        <div className="card-bottom"><span className="checked">{restaurant.menuPublished ? <><span className="check-dot">✓</span> Menu checked {restaurant.updated}</> : <>Restaurant approved · menu coming soon</>}</span><span className="card-arrow">↗</span></div>
       </div>
     </Link>
   );
@@ -56,7 +57,7 @@ export default function Home({ restaurants, isPreview, viewerName }: { restauran
 
   return (
     <main>
-      <div className="announcement"><span className="announcement-spark">✳</span> Addis Ababa, there's something good on the menu. <a href="#restaurants">Find your next bite <span>↗</span></a></div>
+      {/* <div className="announcement"><span className="announcement-spark">✳</span> Addis Ababa, there's something good on the menu. <a href="#restaurants">Find your next bite <span>↗</span></a></div> */}
       <header className="site-header">
         <div className="header-inner">
           <Brand />
@@ -98,7 +99,7 @@ export default function Home({ restaurants, isPreview, viewerName }: { restauran
       <section className="browse-section" id="restaurants">
         <div className="section-heading"><div><p className="eyebrow section-eyebrow">A little bit of everything</p><h2>Find your kind of <em>good.</em></h2></div><a className="text-link" href="#how-it-works">How Yene Menu works <span>↗</span></a></div>
         <div className="category-row" role="group" aria-label="Filter restaurants by food type">{categories.map((category) => <button className={`category-chip ${activeCategory === category ? "active" : ""}`} key={category} onClick={() => setActiveCategory(category)}>{category === "All menus" && <span className="chip-spark">✳</span>}{category}</button>)}</div>
-        <div className="results-line"><span>{query ? `Results for “${query}”` : isPreview ? "A few local favourites" : restaurants.length ? "Menus to make a plan around" : "Addis Ababa menus"}</span><span>{filteredRestaurants.length} places <i>·</i> Addis Ababa</span></div>
+        <div className="results-line"><span>{query ? `Results for “${query}”` : isPreview ? "A few local favourites" : restaurants.length ? "Restaurants approved in Addis Ababa" : "Addis Ababa menus"}</span><span>{filteredRestaurants.length} places <i>·</i> Addis Ababa</span></div>
         {filteredRestaurants.length ? <div className="restaurant-grid">{filteredRestaurants.map((restaurant, index) => <RestaurantCard key={restaurant.slug} restaurant={restaurant} index={index} />)}</div> : <div className="empty-state"><span>⌕</span><h3>{restaurants.length === 0 && !isPreview ? "Addis menus are on their way." : "No menus found just yet."}</h3><p>{restaurants.length === 0 && !isPreview ? "We’re getting Yene Menu ready. Check back soon, or add your restaurant to help diners discover it." : "Try a different dish, area, or category."}</p>{restaurants.length > 0 ? <button onClick={() => { setQuery(""); setActiveCategory("All menus"); }}>Clear filters</button> : !isPreview && <Link className="text-link" href="/for-restaurants">Add your restaurant <span>↗</span></Link>}</div>}
         {isPreview && <div className="preview-note"><span>✳</span> Preview menus — restaurant names and menu details are sample content for this early build.</div>}
       </section>

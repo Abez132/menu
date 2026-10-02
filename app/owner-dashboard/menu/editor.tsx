@@ -12,12 +12,13 @@ const initialState = {};
 
 function blankItem(): MenuItemDraft { return { name: "", description: "", price: 0, tags: [] }; }
 
-export function MenuEditor({ restaurantId, versionId, initialContent, initialAssets, updatedAt }: {
+export function MenuEditor({ restaurantId, versionId, initialContent, initialAssets, updatedAt, canPublish }: {
   restaurantId: string;
   versionId: string;
   initialContent: MenuContent;
   initialAssets: MenuAsset[];
   updatedAt: string;
+  canPublish: boolean;
 }) {
   const [sections, setSections] = useState<MenuSectionDraft[]>(initialContent.sections ?? []);
   const [assets, setAssets] = useState<MenuAsset[]>(initialAssets);
@@ -54,19 +55,24 @@ export function MenuEditor({ restaurantId, versionId, initialContent, initialAss
     if (invalid) { setUploadError(`${invalid.name} must be a PDF, JPG, PNG, or WebP under 5 MB.`); return; }
 
     setUploading(true);
+    const uploaded: MenuAsset[] = [];
     try {
       const supabase = createClient();
-      const uploaded: MenuAsset[] = [];
       for (const file of files) {
         const extension = file.type === "application/pdf" ? "pdf" : file.type === "image/jpeg" ? "jpg" : file.type === "image/png" ? "png" : "webp";
         const path = `${restaurantId}/${versionId}/${crypto.randomUUID()}.${extension}`;
         const { error } = await supabase.storage.from("menu-files").upload(path, file, { contentType: file.type, upsert: false });
-        if (error) throw new Error("A file could not be uploaded. Check your connection and try again.");
-        const { data: signed } = await supabase.storage.from("menu-files").createSignedUrl(path, 60 * 60);
+        if (error) throw new Error(`Couldn’t upload ${file.name}: ${error.message}`);
+        const { data: signed, error: signedError } = await supabase.storage.from("menu-files").createSignedUrl(path, 60 * 60);
+        if (signedError) {
+          await supabase.storage.from("menu-files").remove([path]);
+          throw new Error(`The file was uploaded, but its preview could not be opened: ${signedError.message}`);
+        }
         uploaded.push({ path, name: file.name, type: file.type, size: file.size, url: signed?.signedUrl });
       }
       setAssets((current) => [...current, ...uploaded]);
     } catch (error) {
+      if (uploaded.length) await createClient().storage.from("menu-files").remove(uploaded.map((asset) => asset.path));
       setUploadError(error instanceof Error ? error.message : "The files could not be uploaded. Please try again.");
     } finally {
       setUploading(false);
@@ -142,7 +148,7 @@ export function MenuEditor({ restaurantId, versionId, initialContent, initialAss
     <section className="menu-review-card"><span className="owner-kicker">03 · YOUR REVIEW</span><h3>Preview and confirm</h3><p>Check every dish, price, and file. When you confirm, this menu becomes public on your restaurant page. Any older confirmed menu is replaced at the same time.</p>
       {sections.length > 0 && <div className="menu-review-preview">{sections.map((section, sectionIndex) => <div key={sectionIndex}><strong>{section.name || "Unnamed section"}</strong>{section.items.map((item, itemIndex) => <article className="menu-review-item" key={itemIndex}><p>{item.name || "Unnamed dish"}<span>ETB {new Intl.NumberFormat("en-ET").format(item.price || 0)}</span></p>{item.description && <small>{item.description}</small>}{item.tags.length > 0 && <small className="menu-review-tags">{item.tags.join(" · ")}</small>}</article>)}</div>)}</div>}
       {assets.map((asset) => asset.url && asset.type.startsWith("image/") ? <img className="menu-review-image" src={asset.url} alt={`Preview of ${asset.name}`} key={asset.path} /> : null)}
-      <form onSubmit={publishMenu} className="menu-confirm-form"><input type="hidden" name="versionId" value={versionId} /><label className="menu-confirm-check"><input type="checkbox" name="confirmAccuracy" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I checked the menu and confirm these details and prices are accurate.</span></label>{publishMessage && <p className={`menu-action-message ${publishMessage.kind}`} role="status">{publishMessage.text}</p>}<button className="owner-submit" type="submit" disabled={!confirmed || dirty || uploading || saving || publishing}>{publishing ? "Publishing menu…" : dirty ? "Save draft before confirming" : "Confirm and publish menu"}<span>✓</span></button></form>
+      {canPublish ? <form onSubmit={publishMenu} className="menu-confirm-form"><input type="hidden" name="versionId" value={versionId} /><label className="menu-confirm-check"><input type="checkbox" name="confirmAccuracy" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I checked the menu and confirm these details and prices are accurate.</span></label>{publishMessage && <p className={`menu-action-message ${publishMessage.kind}`} role="status">{publishMessage.text}</p>}<button className="owner-submit" type="submit" disabled={!confirmed || dirty || uploading || saving || publishing}>{publishing ? "Publishing menu…" : dirty ? "Save draft before confirming" : "Confirm and publish menu"}<span>✓</span></button></form> : <div className="admin-notice">This draft is private while your restaurant is under review. After approval, you can check it again and confirm it before it goes public.</div>}
     </section>
   </div>;
 }

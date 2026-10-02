@@ -19,7 +19,7 @@ export async function createMenuDraft(formData: FormData) {
   if (!user) redirect("/for-restaurants/sign-in");
 
   const { data: restaurant } = await supabase.from("restaurants").select("id, status").eq("id", restaurantId).eq("owner_id", user.id).maybeSingle();
-  if (!restaurant || restaurant.status !== "approved") redirect("/owner-dashboard");
+  if (!restaurant || restaurant.status === "suspended") redirect("/owner-dashboard");
 
   const { data: existing } = await supabase.from("menu_versions").select("id").eq("restaurant_id", restaurant.id).eq("status", "draft").maybeSingle();
   if (existing) redirect(`/owner-dashboard/menu?restaurantId=${restaurant.id}`);
@@ -93,7 +93,7 @@ export async function saveMenuDraft(_state: MenuActionState, formData: FormData)
   const { data: version } = await supabase.from("menu_versions").select("id, restaurant_id, status, restaurants!inner(owner_id, slug, status)").eq("id", versionId).maybeSingle();
   if (!version || version.status !== "draft") return { error: "This draft is no longer available. Refresh the page and try again." };
   const restaurant = version.restaurants as unknown as { owner_id: string; slug: string; status: string };
-  if (restaurant.owner_id !== user.id || restaurant.status !== "approved") return { error: "You can only edit a menu for your approved restaurant." };
+  if (restaurant.owner_id !== user.id || restaurant.status === "suspended") return { error: "This restaurant can’t prepare a menu right now." };
 
   const prefix = `${version.restaurant_id}/`;
   if (assets.some((asset) => !asset.path.startsWith(prefix) || !/^[0-9a-f-]{36}\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(pdf|jpg|png|webp)$/i.test(asset.path))) {

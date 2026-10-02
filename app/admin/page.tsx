@@ -97,7 +97,7 @@ export default async function AdminPage({
       ? await supabase
           .from("restaurants")
           .select(
-            "id, owner_id, name, slug, category, neighborhood, street_address, description, public_phone, website_url, status, created_at",
+            "id, owner_id, name, slug, category, neighborhood, street_address, description, public_phone, website_url, cover_image_path, status, created_at",
           )
           .eq("status", active)
           .order("created_at", { ascending: active === "pending_review" })
@@ -113,6 +113,10 @@ export default async function AdminPage({
   const ownerNames = new Map(
     (profiles ?? []).map((profile) => [profile.id, profile.full_name]),
   );
+  const coverImages = new Map(await Promise.all((restaurantsToReview ?? []).filter((restaurant) => restaurant.cover_image_path).map(async (restaurant) => {
+    const { data } = await supabase.storage.from("restaurant-images").createSignedUrl(restaurant.cover_image_path as string, 60 * 60);
+    return [restaurant.id, data?.signedUrl ?? null] as const;
+  })));
 
   const { data: reports, error: reportError } =
     active === "reports"
@@ -532,6 +536,7 @@ export default async function AdminPage({
                     <p className="admin-card-description">
                       {restaurant.description || "No description provided."}
                     </p>
+                    {coverImages.get(restaurant.id) && <img className="admin-restaurant-cover" src={coverImages.get(restaurant.id)!} alt={`Cover photo submitted for ${restaurant.name}`} />}
                     <dl className="admin-facts">
                       <div>
                         <dt>Address</dt>
