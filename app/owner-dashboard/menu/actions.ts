@@ -22,7 +22,7 @@ export async function createMenuDraft() {
   const { data: existing } = await supabase.from("menu_versions").select("id").eq("restaurant_id", restaurant.id).eq("status", "draft").maybeSingle();
   if (existing) redirect("/owner-dashboard/menu");
 
-  const { data: published } = await supabase.from("menu_versions").select("id, content").eq("restaurant_id", restaurant.id).eq("status", "published").maybeSingle();
+  const { data: published } = await supabase.from("menu_versions").select("id, content").eq("restaurant_id", restaurant.id).in("status", ["published", "hidden"]).maybeSingle();
   const { data: draft, error } = await supabase.from("menu_versions").insert({
     restaurant_id: restaurant.id,
     status: "draft",

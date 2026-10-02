@@ -16,7 +16,7 @@ export default async function OwnerMenuPage() {
     ? await supabase.from("menu_versions").select("id, content, updated_at").eq("restaurant_id", restaurant.id).eq("status", "draft").maybeSingle()
     : { data: null };
   const { data: published } = restaurant.status === "approved"
-    ? await supabase.from("menu_versions").select("confirmed_at").eq("restaurant_id", restaurant.id).eq("status", "published").maybeSingle()
+    ? await supabase.from("menu_versions").select("confirmed_at, status").eq("restaurant_id", restaurant.id).in("status", ["published", "hidden"]).maybeSingle()
     : { data: null };
 
   let assets: MenuAsset[] = [];
@@ -35,7 +35,7 @@ export default async function OwnerMenuPage() {
       <p className="eyebrow">Menu studio · {restaurant.neighborhood}, Addis Ababa</p>
       <h1>{restaurant.name}<br /><em>menu.</em></h1>
       {restaurant.status !== "approved" ? <div className="owner-dashboard-card"><span>◷</span><div><strong>Your listing is awaiting review.</strong><p>You can start adding a menu once the Yene Menu team approves your restaurant listing.</p></div></div> : <>
-        <div className="owner-menu-status"><span className="check-dot">✓</span>{published?.confirmed_at ? `Current public menu confirmed ${new Date(published.confirmed_at).toLocaleDateString("en-ET", { day: "numeric", month: "long", year: "numeric" })}` : "No public menu yet. Your first confirmed menu will appear on your listing."}</div>
+        {published?.status === "hidden" ? <div className="admin-notice error">Your last confirmed menu is temporarily hidden while the Yene Menu team reviews a report. You can prepare an updated draft below.</div> : <div className="owner-menu-status"><span className="check-dot">✓</span>{published?.confirmed_at ? `Current public menu confirmed ${new Date(published.confirmed_at).toLocaleDateString("en-ET", { timeZone: "Africa/Addis_Ababa", day: "numeric", month: "long", year: "numeric" })}` : "No public menu yet. Your first confirmed menu will appear on your listing."}</div>}
         {draft ? <MenuEditor restaurantId={restaurant.id} versionId={draft.id} initialContent={(draft.content as MenuContent | null) ?? { sections: [] }} initialAssets={assets} updatedAt={draft.updated_at} /> : <form action={createMenuDraft} className="owner-menu-start"><span className="owner-message-icon">✳</span><h2>Make your menu yours.</h2><p>Add dishes and prices, upload a menu photo or PDF, or use both. You can review the whole menu before you confirm it for customers.</p><button className="owner-submit" type="submit">{published ? "Start a new menu version" : "Create your first menu"}<span>→</span></button></form>}
       </>}
     </section>

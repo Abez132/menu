@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { formatBirr, restaurants } from "@/lib/restaurants";
 import { createClient } from "@/lib/supabase/server";
 import type { MenuContent } from "@/lib/menu-types";
+import { MenuReportForm } from "../menu-report-form";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -52,6 +53,7 @@ export default async function RestaurantPage({ params }: { params: Promise<{ slu
         {liveRestaurant && liveFiles.map((file) => file.url ? file.content_type.startsWith("image/") ? <a className="public-menu-image-link" href={file.url} target="_blank" rel="noreferrer" key={file.storage_path}><img className="public-menu-image" src={file.url} alt={`${liveRestaurant.name} menu: ${file.original_name}`} /><span>{file.original_name}</span></a> : <a className="public-menu-pdf" href={file.url} target="_blank" rel="noreferrer" key={file.storage_path}><span>PDF</span><strong>{file.original_name}</strong><small>Open the restaurant menu file ↗</small></a> : null)}
         {liveRestaurant && !liveMenu && <div className="menu-empty-public"><strong>The restaurant is setting up its menu.</strong><p>Please check back soon or contact the restaurant directly.</p></div>}
         <p className="detail-disclaimer">Menu shared by the restaurant. Items and prices may change; please check with the restaurant before ordering.</p>
+        {liveRestaurant && liveMenu && <details className="menu-report-details"><summary>Report an issue with this menu</summary><p>Tell us what looks wrong and we’ll review it.</p><MenuReportForm restaurantId={liveRestaurant.id} versionId={liveMenu.id} /></details>}
       </div>
       <footer className="site-footer detail-footer"><div className="footer-top"><Link className="brand" href="/"><span className="brand-mark" aria-hidden="true"><span /></span><span>yene<span className="brand-menu">menu</span></span></Link><p>A little closer to your next<br />favourite meal.</p><Link href="/#restaurants">Back to explore ↑</Link></div><div className="footer-bottom"><span>© 2026 Yene Menu · Addis Ababa</span><span>Menu details provided by restaurants.</span></div></footer>
     </main>

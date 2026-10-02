@@ -1,6 +1,6 @@
 # Yene Menu — Build Plan
 
-## Part 1 — Public browsing foundation (implemented; live database listings are a later step)
+## Part 1 — Public browsing foundation (implemented)
 
 - Create the Next.js and TypeScript app structure.
 - Build a mobile-friendly discovery page for Addis Ababa.
@@ -8,7 +8,7 @@
 - Add restaurant detail pages with sample menus, ETB prices, and menu confirmation dates.
 - Use clearly identified preview data until real restaurants are onboarded.
 
-Current files include the public home page, restaurant detail pages, restaurant-owner information, and six sample restaurants with ETB menu prices. The home page continues to use preview data while real approved listings are connected in a later build part.
+Current files include the public home page, restaurant detail pages, restaurant-owner information, and six sample restaurants with ETB menu prices. The home page now displays approved restaurants with confirmed menus when connected to Supabase, and uses clearly labelled samples until real menus are available.
 
 ## Part 2 — Restaurant onboarding (implementation drafted; Supabase connection pending)
 
@@ -27,11 +27,13 @@ The sign-up, sign-in, confirmation callback, and owner listing status pages are 
 
 The owner dashboard now links approved restaurants to a menu studio with editable sections and items, dietary tags, birr prices, private photo/PDF uploads, a preview, and an explicit owner confirmation step. The database stores menu versions and file metadata; a transaction-backed database function publishes the selected draft and archives the prior public version together. The public restaurant detail route reads approved, confirmed database menus while retaining the sample menus as preview data. Apply `supabase/migrations/202609300001_owner_menu_management.sql` to enable these flows; the migration creates the private Storage bucket and access policies.
 
-## Part 4 — Administrator review
+## Part 4 — Administrator review (implemented; apply the new migration)
 
 - Add an administrator view for approving or declining new restaurant listings.
 - Support unpublishing listings and handling reports.
 - Ensure only approved restaurants and confirmed menus are public.
+
+The `/admin` area is restricted with the database-backed administrator role. It includes listing queues for pending, approved, declined, and hidden restaurants; approval, decline, hide, and restore actions; detail corrections; and a private menu report queue with resolution notes. Administrators can inspect the reported menu version and its uploaded files, and hide or restore an individual menu without suspending the restaurant. Visitors can report an issue on a live restaurant menu. Only administrators can read reports and reporter contact details.
 
 ## Part 5 — Launch preparation
 
