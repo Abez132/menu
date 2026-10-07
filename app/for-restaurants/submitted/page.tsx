@@ -2,6 +2,70 @@ import Link from "next/link";
 
 export default function RestaurantSubmittedPage() {
   return (
-    <main className="detail-page"><header className="site-header detail-header"><div className="header-inner"><Link className="brand" href="/"><span className="brand-mark" aria-hidden="true"><span /></span><span>yene<span className="brand-menu">menu</span></span></Link><Link className="header-cta" href="/">Home <span>↗</span></Link></div></header><section className="owner-message-page"><span className="owner-message-icon success">✓</span><p className="eyebrow">Thanks for joining us</p><h1>Your listing is<br /><em>in review.</em></h1><p>Your email is verified and your restaurant details are with our team. We’ll review the listing before it appears publicly.</p><div className="owner-signup-note"><span>✳</span><p><strong>You can prepare your menu privately.</strong><br />Sign in to add dishes or upload menu photos and PDFs. After your restaurant is approved, review the menu and confirm it before it appears to diners.</p></div><Link className="owner-page-link" href="/for-restaurants/sign-in">Sign in to continue →</Link></section><footer className="site-footer detail-footer"><div className="footer-top"><Link className="brand" href="/"><span className="brand-mark" aria-hidden="true"><span /></span><span>yene<span className="brand-menu">menu</span></span></Link><p>A little closer to your next<br />favourite meal.</p><Link href="/">Back to home ↑</Link></div><div className="footer-bottom"><span>© 2026 Yene Menu · Addis Ababa</span><span>Menu details provided by restaurants.</span></div></footer></main>
+    <main className="detail-page">
+      <header className="site-header detail-header">
+        <div className="header-inner">
+          <Link className="brand" href="/">
+            <span className="brand-mark" aria-hidden="true">
+              <span />
+            </span>
+            <span>
+              yene<span className="brand-menu">menu</span>
+            </span>
+          </Link>
+          <Link className="header-cta" href="/">
+            Home <span>↗</span>
+          </Link>
+        </div>
+      </header>
+      <section className="owner-message-page">
+        <span className="owner-message-icon success">✓</span>
+        <p className="eyebrow">Thanks for joining us</p>
+        <h1>
+          Your listing is
+          <br />
+          <em>in review.</em>
+        </h1>
+        <p>
+          Your email is verified and your restaurant details are with our team.
+          We’ll review the listing before it appears publicly.
+        </p>
+        <div className="owner-signup-note">
+          <span>✳</span>
+          <p>
+            <strong>You can prepare your menu privately.</strong>
+            <br />
+            Sign in to add dishes or upload menu photos and PDFs. After your
+            restaurant is approved, review the menu and confirm it before it
+            appears to diners.
+          </p>
+        </div>
+        <Link className="owner-page-link" href="/for-restaurants/sign-in">
+          Sign in to continue →
+        </Link>
+      </section>
+      <footer className="site-footer detail-footer">
+        <div className="footer-top">
+          <Link className="brand" href="/">
+            <span className="brand-mark" aria-hidden="true">
+              <span />
+            </span>
+            <span>
+              yene<span className="brand-menu">menu</span>
+            </span>
+          </Link>
+          <p>
+            A little closer to your next
+            <br />
+            favourite meal.
+          </p>
+          <Link href="/">Back to home ↑</Link>
+        </div>
+        <div className="footer-bottom">
+          <span>© 2026 Yene Menu · Addis Ababa</span>
+          <span>Menu details provided by restaurants.</span>
+        </div>
+      </footer>
+    </main>
   );
 }
