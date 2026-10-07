@@ -4,8 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-const categories = new Set(["Ethiopian", "Café & brunch", "Grill", "Italian", "Healthy", "Other"]);
-const neighborhoods = new Set(["Bole", "Kazanchis", "Piazza", "Sarbet", "Old Airport", "Mexico", "Kirkos", "Other"]);
 const reportStatuses = new Set(["open", "investigating", "resolved", "dismissed"]);
 
 function value(formData: FormData, name: string) { return String(formData.get(name) ?? "").trim(); }
@@ -42,33 +40,6 @@ export async function moderateRestaurant(formData: FormData) {
   redirect(`/admin?status=${transition.to}&saved=1`);
 }
 
-export async function updateRestaurantDetails(formData: FormData) {
-  const id = value(formData, "restaurantId");
-  const name = value(formData, "name");
-  const category = value(formData, "category");
-  const neighborhood = value(formData, "neighborhood");
-  const address = value(formData, "streetAddress");
-  const description = value(formData, "description");
-  const phone = value(formData, "publicPhone");
-  const website = value(formData, "websiteUrl");
-  if (!/^[0-9a-f-]{36}$/i.test(id) || name.length < 2 || name.length > 100 || !categories.has(category) || !neighborhoods.has(neighborhood) || !address || address.length > 240 || description.length > 600 || phone.length > 40 || website.length > 300) redirect("/admin?error=invalid");
-  if (website) {
-    try {
-      const parsed = new URL(website);
-      if (!(["https:", "http:"].includes(parsed.protocol))) throw new Error("Invalid URL protocol");
-    } catch { redirect("/admin?error=invalid"); }
-  }
-  const { supabase } = await adminClient();
-  const { data: updated, error } = await supabase.from("restaurants").update({
-    name, category, neighborhood, street_address: address, description,
-    public_phone: phone || null, website_url: website || null,
-  }).eq("id", id).select("slug").maybeSingle();
-  if (error || !updated) redirect("/admin?error=save");
-  revalidatePath("/admin");
-  revalidatePath("/");
-  revalidatePath(`/restaurants/${updated.slug}`);
-  redirect("/admin?saved=1");
-}
 
 export async function moderateMenuReport(formData: FormData) {
   const id = value(formData, "reportId");

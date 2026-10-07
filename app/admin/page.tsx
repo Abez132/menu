@@ -7,7 +7,6 @@ import {
   moderateMenuReport,
   moderateReportedMenu,
   moderateRestaurant,
-  updateRestaurantDetails,
 } from "./actions";
 
 const listingStatuses = [
@@ -22,24 +21,6 @@ const reportStatuses = [
   "resolved",
   "dismissed",
 ] as const;
-const categoryOptions = [
-  "Ethiopian",
-  "Café & brunch",
-  "Grill",
-  "Italian",
-  "Healthy",
-  "Other",
-];
-const neighborhoodOptions = [
-  "Bole",
-  "Kazanchis",
-  "Piazza",
-  "Sarbet",
-  "Old Airport",
-  "Mexico",
-  "Kirkos",
-  "Other",
-];
 const listingLabels: Record<string, string> = {
   pending_review: "Awaiting review",
   approved: "Published",
@@ -203,8 +184,8 @@ export default async function AdminPage({
           <em>keep it current.</em>
         </h1>
         <p className="admin-intro">
-          Approve restaurant listings, update public details, keep inaccurate
-          listings hidden, and respond to menu reports.
+          Review restaurant listings, approve or decline submissions, keep
+          inaccurate listings hidden, and respond to menu reports.
         </p>
         {query.saved && (
           <p className="admin-notice success" role="status">
@@ -662,91 +643,6 @@ export default async function AdminPage({
                         </Link>
                       )}
                     </div>
-                    <details className="admin-edit-details">
-                      <summary>Edit listing details</summary>
-                      <form
-                        action={updateRestaurantDetails}
-                        className="admin-edit-form"
-                      >
-                        <input
-                          type="hidden"
-                          name="restaurantId"
-                          value={restaurant.id}
-                        />
-                        <div className="form-grid">
-                          <label className="form-field">
-                            <span>RESTAURANT NAME</span>
-                            <input
-                              name="name"
-                              required
-                              maxLength={100}
-                              defaultValue={restaurant.name}
-                            />
-                          </label>
-                          <label className="form-field">
-                            <span>CATEGORY</span>
-                            <select
-                              name="category"
-                              defaultValue={restaurant.category}
-                            >
-                              {categoryOptions.map((option) => (
-                                <option key={option}>{option}</option>
-                              ))}
-                            </select>
-                          </label>
-                          <label className="form-field">
-                            <span>NEIGHBOURHOOD</span>
-                            <select
-                              name="neighborhood"
-                              defaultValue={restaurant.neighborhood}
-                            >
-                              {neighborhoodOptions.map((option) => (
-                                <option key={option}>{option}</option>
-                              ))}
-                            </select>
-                          </label>
-                          <label className="form-field">
-                            <span>STREET ADDRESS</span>
-                            <input
-                              name="streetAddress"
-                              required
-                              maxLength={240}
-                              defaultValue={restaurant.street_address}
-                            />
-                          </label>
-                          <label className="form-field form-field-wide">
-                            <span>DESCRIPTION</span>
-                            <textarea
-                              name="description"
-                              maxLength={600}
-                              rows={3}
-                              defaultValue={restaurant.description}
-                            />
-                          </label>
-                          <label className="form-field">
-                            <span>PUBLIC PHONE</span>
-                            <input
-                              name="publicPhone"
-                              maxLength={40}
-                              defaultValue={restaurant.public_phone ?? ""}
-                            />
-                          </label>
-                          <label className="form-field">
-                            <span>WEBSITE</span>
-                            <input
-                              name="websiteUrl"
-                              type="url"
-                              maxLength={300}
-                              defaultValue={restaurant.website_url ?? ""}
-                              placeholder="https://"
-                            />
-                          </label>
-                        </div>
-                        <button className="admin-save-button" type="submit">
-                          Save listing details <span>→</span>
-                        </button>
-                      </form>
-                    </details>
                   </article>
                 ))}
               </div>
